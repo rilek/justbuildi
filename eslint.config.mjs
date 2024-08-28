@@ -1,9 +1,9 @@
 import tsEslint from "typescript-eslint";
 import js from "@eslint/js";
-
-// const project = resolve(process.cwd(), "tsconfig.json");
+import eslintConfigPrettier from "eslint-config-prettier"
 
 export default [
   js.configs.recommended,
   ...tsEslint.configs.recommended,
+  eslintConfigPrettier
 ];
