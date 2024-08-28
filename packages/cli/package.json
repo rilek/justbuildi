@@ -7,6 +7,21 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "license": "MIT",
+  "author": {
+    "name": "rilek"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:rilek/justbuildit.git",
+    "directory": "packages/cli"
+  },
+  "type": "module",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
 }
