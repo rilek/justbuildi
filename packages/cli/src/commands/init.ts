@@ -67,7 +67,7 @@ const setupRepo = async (options: Options, config: Config) => {
   await fse.ensureDir(repoRoot);
 
   console.log("Creating turborepo...");
-  await execAsync(`cd ${repoRoot} && pnpx create-turbo@latest . -m pnpm`);
+  await execAsync(`cd ${repoRoot} && pnpx create-turbo@latest . -m pnpm --skip-install --skip-transforms`);
   await execAsync(`cd ${repoRoot} && rm -rf apps packages`);
 
   console.log("Writing pnpm-workspace.yaml...");
