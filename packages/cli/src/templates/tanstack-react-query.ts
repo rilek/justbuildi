@@ -71,7 +71,7 @@ export const transformer: Transform = (file, api) => {
   const j = api.jscodeshift;
   const root = j(file.source);
 
-  addImport(j, root, ["QueryClient", "QueryClientProvider"], "react-query");
+  addImport(j, root, ["QueryClient", "QueryClientProvider"], "@tanstack/react-query");
 
   addGlobal(j, root, "const queryClient = new QueryClient()");
 

@@ -1,12 +1,7 @@
-import transformer from "./react-query";
+import tanstackReactQuery from "./tanstack-react-query";
+import tanstackReactRouter from "./tanstack-react-router";
 
 export default {
-  "@tanstack/react-query": [
-    {
-      bundler: "vite",
-      template: "react-ts",
-      file: "src/main.tsx",
-      transformer,
-    },
-  ],
+  "@tanstack/react-query": tanstackReactQuery,
+  "@tanstack/react-router": tanstackReactRouter
 } as const;

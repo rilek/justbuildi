@@ -7,6 +7,10 @@ import path from "path";
 import { exec } from "child_process";
 import { PackageJson } from "type-fest";
 
+import templates from "../templates";
+import jscodeshift, { API } from "jscodeshift";
+import Runner from "jscodeshift/src/Runner";
+
 const optionsSchema = z.object({
   cwd: z.string().min(1),
 });
@@ -49,8 +53,28 @@ const setupPackage = async (config: Config, project: Project) => {
 
     if (type === "frontend") {
       switch (dep) {
-        case "@tanstack/react-query":
+        case "@tanstack/react-query": {
+          const transformer = templates["@tanstack/react-query"];
+          const mainTsxPath = path.join(projectRoot, "src", "main.tsx");
+
+          const mainTsx = await fse.readFile(mainTsxPath);
+
+          const j = jscodeshift.withParser("tsx");
+
+          const transformedCode = transformer(
+            { path: mainTsxPath, source: mainTsx.toString() },
+            { j, jscodeshift: j } as API,
+            { parser: "tsx" }
+          );
+
+          if (!transformedCode) {
+            throw new Error("Failed to transform code");
+          }
+
+          fse.writeFile(mainTsxPath, transformedCode);
+
           break;
+        }
         case "@tanstack/react-router":
           break;
         default:
@@ -60,6 +84,9 @@ const setupPackage = async (config: Config, project: Project) => {
 
     await execAsync(`cd ${projectRoot} && pnpm add ${dep}`);
   }
+
+  console.log("installing dependencies");
+  await execAsync(`cd ${projectRoot} && pnpm install`);
 };
 
 const setupRepo = async (options: Options, config: Config) => {
@@ -67,7 +94,9 @@ const setupRepo = async (options: Options, config: Config) => {
   await fse.ensureDir(repoRoot);
 
   console.log("Creating turborepo...");
-  await execAsync(`cd ${repoRoot} && pnpx create-turbo@latest . -m pnpm --skip-install --skip-transforms`);
+  await execAsync(
+    `cd ${repoRoot} && pnpx create-turbo@latest . -m pnpm --skip-install --skip-transforms`
+  );
   await execAsync(`cd ${repoRoot} && rm -rf apps packages`);
 
   console.log("Writing pnpm-workspace.yaml...");
@@ -115,7 +144,16 @@ const initAction = async (opts: unknown) => {
     fse.emptyDir(getRootDir(options, config));
 
     await setupRepo(options, config);
+
+    if (config)
+      fse.writeJSON(path.join(options.cwd, "justbuildit.config.json"), config, {
+        spaces: 2,
+      });
   } catch (e) {
+    if (config)
+      fse.writeJSON(path.join(options.cwd, "justbuildit.config.json"), config, {
+        spaces: 2,
+      });
     console.error(e);
     process.exit(1);
   }

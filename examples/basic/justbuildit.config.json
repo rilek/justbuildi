@@ -1,13 +1,11 @@
 {
   "name": "@justbuildit/example",
-  "path": "./basic",
+  "path": ".",
   "projects": [
     {
       "name": "frontend",
       "dir": "apps",
       "type": "frontend",
-      "bundler": "vite",
-      "template": "react-ts",
       "dependencies": [
         "@tanstack/react-query",
         "@tanstack/react-router"
@@ -17,8 +15,6 @@
       "name": "backend",
       "dir": "apps",
       "type": "backend",
-      "template": "fastify",
-      "bundler": "tsup",
       "dependencies": [
         "fastify"
       ]

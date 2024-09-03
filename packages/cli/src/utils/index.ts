@@ -14,21 +14,19 @@ const projectSchema = z.object({
   name: z.string().min(1),
   dir: z.string().min(1),
   type: z.string().min(1),
-  template: z.string().optional(),
-  bundler: z.string().min(1),
-  dependencies: z.array(z.string()).optional()
-})
+  dependencies: z.array(z.string()).optional(),
+});
 
 const configSchema = z.object({
   name: z.string().min(1),
   path: z.string().min(1),
-  projects: z.array(projectSchema)
+  projects: z.array(projectSchema),
 });
 
 export type Config = z.infer<typeof configSchema>;
 export type Project = z.infer<typeof projectSchema>;
 
 export const getConfigJson = async (cwd: string) =>
-  configSchema.parseAsync(
+  await configSchema.parseAsync(
     await fse.readJSON(path.join(cwd, "justbuildit.config.json"))
   );
