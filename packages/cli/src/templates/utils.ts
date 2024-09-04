@@ -1,11 +1,6 @@
-import {
-  type Transform,
-  type JSCodeshift,
-  type Collection,
-  type ImportDeclaration,
-} from "jscodeshift";
+import { Collection, ImportDeclaration, JSCodeshift } from "jscodeshift";
 
-const appendImport = (
+export const appendImport = (
   j: JSCodeshift,
   root: Collection<unknown>,
   newImport: ImportDeclaration
@@ -22,7 +17,7 @@ const appendImport = (
   }
 };
 
-const addImport = (
+export const addImport = (
   j: JSCodeshift,
   root: Collection<unknown>,
   imports: string[],
@@ -36,17 +31,20 @@ const addImport = (
   appendImport(j, root, newImport);
 };
 
-const addGlobal = (j: JSCodeshift, root: Collection<unknown>, code: string) => {
+export const addGlobal = (
+  j: JSCodeshift,
+  root: Collection<unknown>,
+  code: string
+) => {
   root.find(j.ImportDeclaration).at(-1).insertAfter(code);
 };
 
-const wrapReactComponentChildren = (
+export const wrapReactComponentChildren = (
   j: JSCodeshift,
   root: Collection<unknown>,
   componentName: string,
   wrapperName: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  props: Record<string, { type: "expression" | "value"; value: any }> = {}
+  props: Record<string, { type: "expression" | "value"; value: string }> = {}
 ) => {
   root.findJSXElements(componentName).forEach((el) => {
     const newElement = j.jsxElement(
@@ -55,7 +53,9 @@ const wrapReactComponentChildren = (
         Object.entries(props).map(([k, { type, value }]) =>
           j.jsxAttribute(
             j.jsxIdentifier(k),
-            type === "expression" ? j.jsxExpressionContainer(j.identifier(value)) : j.stringLiteral(value)
+            type === "expression"
+              ? j.jsxExpressionContainer(j.identifier(value))
+              : j.stringLiteral(value)
           )
         )
       ),
@@ -66,21 +66,3 @@ const wrapReactComponentChildren = (
     el.replace(newElement);
   });
 };
-
-export const transformer: Transform = (file, api) => {
-  const j = api.jscodeshift;
-  const root = j(file.source);
-
-  addImport(j, root, ["QueryClient", "QueryClientProvider"], "tanstack-react-query");
-
-  addGlobal(j, root, "const queryClient = new QueryClient()");
-
-  wrapReactComponentChildren(j, root, "App", "QueryClientProvider", {
-    client: { type: "expression", value: "queryClient" },
-  });
-
-
-  return root.toSource();
-};
-
-export default transformer;
