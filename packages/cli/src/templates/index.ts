@@ -3,5 +3,5 @@ import tanstackReactRouter from "./tanstack-react-router";
 
 export default {
   "@tanstack/react-query": tanstackReactQuery,
-  "@tanstack/react-router": tanstackReactRouter
+  "@tanstack/react-router": tanstackReactRouter,
 } as const;

@@ -9,7 +9,6 @@ import { PackageJson } from "type-fest";
 
 import templates from "../templates";
 import jscodeshift, { API } from "jscodeshift";
-import Runner from "jscodeshift/src/Runner";
 
 const optionsSchema = z.object({
   cwd: z.string().min(1),
@@ -29,8 +28,7 @@ const execAsync = (command: string) => {
 
 type Options = z.infer<typeof optionsSchema>;
 
-const getRootDir = (options: Options, config: Config) =>
-  path.join(options.cwd, config.path);
+const getRootDir = (options: Options, config: Config) => path.join(options.cwd, config.path);
 
 const setupPackage = async (config: Config, project: Project) => {
   const { dir, name, dependencies, type } = project;
@@ -39,14 +37,10 @@ const setupPackage = async (config: Config, project: Project) => {
   await fse.ensureDir(projectRoot);
 
   if (type === "frontend")
-    await execAsync(
-      `cd ${projectRoot} && pnpm create vite . --template react-ts`
-    );
+    await execAsync(`cd ${projectRoot} && pnpm create vite . --template react-ts`);
 
   if (type === "backend")
-    await execAsync(
-      `cd ${projectRoot} && pnpx fastify-cli generate . --esm --lang=ts`
-    );
+    await execAsync(`cd ${projectRoot} && pnpx fastify-cli generate . --esm --lang=ts`);
 
   for await (const dep of dependencies ?? []) {
     console.log(`Adding ${dep} to ${name}`);
@@ -112,9 +106,7 @@ const setupRepo = async (options: Options, config: Config) => {
 
   console.log("Updating package.json...");
   const deps = config.projects.map((p) => p.dependencies).flat();
-  const packageJson = (await fse.readJson(
-    path.join(repoRoot, "package.json")
-  )) as PackageJson;
+  const packageJson = (await fse.readJson(path.join(repoRoot, "package.json"))) as PackageJson;
 
   packageJson.name = config.name;
   packageJson.dependencies = {
@@ -122,10 +114,7 @@ const setupRepo = async (options: Options, config: Config) => {
     ...Object.fromEntries(deps.map((d) => [d, "*"])),
   };
 
-  await fse.writeFile(
-    path.join(repoRoot, "package.json"),
-    JSON.stringify(packageJson, null, 2)
-  );
+  await fse.writeFile(path.join(repoRoot, "package.json"), JSON.stringify(packageJson, null, 2));
 
   const projects = config.projects;
 
